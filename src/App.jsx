@@ -1,148 +1,134 @@
-import './App.css';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
+import "./App.css";
+import { useFormik } from "formik";
+import * as yup from "yup";
 import axios from "axios";
-import { useEffect, useState } from 'react';
-
-
-let baseUrl = ``;
-if (window.location.href.split(":")[0] === "http") {
-  baseUrl = `http://localhost:5001`;
-}
+import { useEffect, useState } from "react";
 
 function App() {
-
-  const [products, setProducts] = useState([])
-  const [loadProduct, setLoadProduct] = useState(false)
-  const [isEditMode, setIsEditMode] = useState(false)
-  const [editingProduct, setEditingProduct] = useState(null)
-
+  const [products, setProducts] = useState([]);
+  const [loadProduct, setLoadProduct] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
 
   const getAllProducts = async () => {
     try {
-      const response = await axios.get(`http://localhost:5001/products`)
+      const response = await axios.get(`http://localhost:5001/products`);
       console.log("response: ", response.data);
 
-      setProducts(response.data.data.reverse())
-
+      setProducts(response.data.data.reverse());
     } catch (error) {
       console.log("error in getting all products", error);
     }
-  }
+  };
 
   const deleteProduct = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:5001/product/${id}`)
+      const response = await axios.delete(
+        `http://localhost:5001/product/${id}`
+      );
       console.log("response: ", response.data);
 
-      setLoadProduct(!loadProduct)
-
+      setLoadProduct(!loadProduct);
     } catch (error) {
-      console.log("errors in getting all products", error);
+      console.log("error in getting all products", error);
     }
-  }
+  };
 
   const editMode = (product) => {
-    setIsEditMode(!isEditMode)
-    setEditingProduct(product)
+    setIsEditMode(!isEditMode);
+    setEditingProduct(product);
 
-    editFormik.setFieldValue("productName", product.name)
-    editFormik.setFieldValue("productPrice", product.price)
-    editFormik.setFieldValue("productDescription", product.description)
-   
-  }
+    updateFormik.setFieldValue("productName", product.name);
+    updateFormik.setFieldValue("productPrice", product.price);
+    updateFormik.setFieldValue("productDescription", product.description);
+  };
 
   useEffect(() => {
-
-    getAllProducts()
-
-  }, [loadProduct])
-
+    getAllProducts();
+  }, [loadProduct]);
 
   const myFormik = useFormik({
     initialValues: {
-      productName: '',
-      productPrice: '',
-      productDescription: '',
+      productName: "",
+      productPrice: "",
+      productDescription: "",
     },
-    validationSchema:
-      yup.object({
-        productName: yup
-          .string('Enter your product name')
-          .required('product name is required')
-          .min(3, "please enter more then 3 characters ")
-          .max(20, "please enter within 20 characters "),
+    validationSchema: yup.object({
+      productName: yup
+        .string("Enter your product name")
+        .required("product name is required")
+        .min(3, "please enter more then 3 characters ")
+        .max(20, "please enter within 20 characters "),
 
-        productPrice: yup
-          .number('Enter your product price')
-          .positive("enter positive product price")
-          .required('product name is required'),
+      productPrice: yup
+        .number("Enter your product price")
+        .positive("enter positive product price")
+        .required("product name is required"),
 
-        productDescription: yup
-          .string('Enter your product Description')
-          .required('product name is required')
-          .min(3, "please enter more then 3 characters ")
-          .max(500, "please enter within 20 characters "),
-      }),
+      productDescription: yup
+        .string("Enter your product Description")
+        .required("product name is required")
+        .min(3, "please enter more then 3 characters ")
+        .max(500, "please enter within 20 characters "),
+    }),
     onSubmit: (values) => {
       console.log("values: ", values);
 
-      axios.post(`http://localhost:5001/product`, {
-        name: values.productName,
-        price: values.productPrice,
-        description: values.productDescription,
-      })
-        .then(response => {
+      axios
+        .post(`http://localhost:5001/product`, {
+          name: values.productName,
+          price: values.productPrice,
+          description: values.productDescription,
+        })
+        .then((response) => {
           console.log("response: ", response.data);
-          setLoadProduct(!loadProduct)
-
+          setLoadProduct(!loadProduct);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log("error: ", err);
-        })
+        });
     },
   });
-  const editFormik = useFormik({
+  const updateFormik = useFormik({
     initialValues: {
-      productName: '',
-      productPrice: '',
-      productDescription: '',
+      productName: "",
+      productPrice: "",
+      productDescription: "",
     },
-    validationSchema:
-      yup.object({
-        productName: yup
-          .string('Enter your product name')
-          .required('product name is required')
-          .min(3, "please enter more then 3 characters ")
-          .max(20, "please enter within 20 characters "),
+    validationSchema: yup.object({
+      productName: yup
+        .string("Enter your product name")
+        .required("product name is required")
+        .min(3, "please enter more then 3 characters ")
+        .max(20, "please enter within 20 characters "),
 
-        productPrice: yup
-          .number('Enter your product price')
-          .positive("enter positive product price")
-          .required('product name is required'),
+      productPrice: yup
+        .number("Enter your product price")
+        .positive("enter positive product price")
+        .required("product name is required"),
 
-        productDescription: yup
-          .string('Enter your product Description')
-          .required('product name is required')
-          .min(3, "please enter more then 3 characters ")
-          .max(500, "please enter within 20 characters "),
-      }),
+      productDescription: yup
+        .string("Enter your product Description")
+        .required("product name is required")
+        .min(3, "please enter more then 3 characters ")
+        .max(500, "please enter within 20 characters "),
+    }),
     onSubmit: (values) => {
       console.log("values: ", values);
 
-      axios.put(`http://localhost:5001/product/${editingProduct._id}`, {
-        name: values.productName,
-        price: values.productPrice,
-        description: values.productDescription,
-      })
-        .then(response => {
+      axios
+        .put(`http://localhost:5001/product/${editingProduct._id}`, {
+          name: values.productName,
+          price: values.productPrice,
+          description: values.productDescription,
+        })
+        .then((response) => {
           console.log("response: ", response.data);
-          setLoadProduct(!loadProduct)
-
+          setLoadProduct(!loadProduct);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log("error: ", err);
-        })
+        });
     },
   });
 
@@ -267,17 +253,17 @@ function App() {
 
                   {isEditMode && editingProduct._id === eachProduct._id ? (
                     <div>
-                      <form onSubmit={editFormik.handleSubmit}>
+                      <form onSubmit={updateFormik.handleSubmit}>
                         <input
                           id="productName"
                           placeholder="Product Name"
-                          value={editFormik.values.productName}
-                          onChange={editFormik.handleChange}
+                          value={updateFormik.values.productName}
+                          onChange={updateFormik.handleChange}
                         />
-                        {editFormik.touched.productName &&
-                        Boolean(editFormik.errors.productName) ? (
+                        {updateFormik.touched.productName &&
+                        Boolean(updateFormik.errors.productName) ? (
                           <span style={{ color: "red" }}>
-                            {editFormik.errors.productName}
+                            {updateFormik.errors.productName}
                           </span>
                         ) : null}
 
@@ -286,13 +272,13 @@ function App() {
                         <input
                           id="productDescription"
                           placeholder="Product Description"
-                          value={editFormik.values.productDescription}
-                          onChange={editFormik.handleChange}
+                          value={updateFormik.values.productDescription}
+                          onChange={updateFormik.handleChange}
                         />
-                        {editFormik.touched.productDescription &&
-                        Boolean(editFormik.errors.productDescription) ? (
+                        {updateFormik.touched.productDescription &&
+                        Boolean(updateFormik.errors.productDescription) ? (
                           <span style={{ color: "red" }}>
-                            {editFormik.errors.productDescription}
+                            {updateFormik.errors.productDescription}
                           </span>
                         ) : null}
 
@@ -301,13 +287,13 @@ function App() {
                         <input
                           id="productPrice"
                           placeholder="Product Price"
-                          value={editFormik.values.productPrice}
-                          onChange={editFormik.handleChange}
+                          value={updateFormik.values.productPrice}
+                          onChange={updateFormik.handleChange}
                         />
-                        {editFormik.touched.productPrice &&
-                        Boolean(editFormik.errors.productPrice) ? (
+                        {updateFormik.touched.productPrice &&
+                        Boolean(updateFormik.errors.productPrice) ? (
                           <span style={{ color: "red" }}>
-                            {editFormik.errors.productPrice}
+                            {updateFormik.errors.productPrice}
                           </span>
                         ) : null}
 
